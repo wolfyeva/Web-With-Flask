@@ -3,12 +3,12 @@ from flask import Flask, render_template, url_for, request
 app = Flask(__name__)
 
 def register_action():
-    username = request.form.get('username', '')
+    user = request.form.get('username', '')
     email = request.form.get('email', '')
     password1 = request.form.get('password1', '')
     password2 = request.form.get('password2', '')
 
-    if not username:
+    if not user:
         return '請輸入username'
     elif not email:
         return '請輸入email'
@@ -21,18 +21,18 @@ def register_action():
     elif not password1==password2:
         return '兩次密碼必須相符'
 
-    con = sqlite3.connect('mywebsite.db')
+    con = sqlite3.connect('Module_04\Example_01\myweb.db')
     cur = con.cursor()
     cur.execute(f'SELECT * FROM user WHERE `email`="{email}"')
     queryresult = cur.fetchall()
     if queryresult:
         return 'email重複，請使用另一個email'
-    cur.execute(f'SELECT * FROM user WHERE `username`="{username}"')
+    cur.execute(f'SELECT * FROM user WHERE `username`="{user}"')
     queryresult = cur.fetchall()
     if queryresult:
         return 'username重複，請使用另一個usernme'
     # Insert a row of data
-    cur.execute(f"INSERT INTO user (`username`, `email`, `password`) VALUES ('{username}','{email}','{password1}')")
+    cur.execute(f"INSERT INTO user (`username`, `email`, `password`) VALUES ('{user}','{email}','{password1}')")
     # Save (commit) the changes
     con.commit()
     # We can also close the connection if we are done with it.
@@ -44,9 +44,9 @@ def register_action():
 def index():
     return render_template('index.html')
 
-@app.route('/user/<username>')
-def show_user_profile(username):
-    return render_template('user.html', username = username)
+@app.route('/user/<user>')
+def show_user_profile(user):
+    return render_template('user.html', user = user)
 
 @app.route('/register', methods=['GET','POST'])
 def register():
@@ -55,9 +55,9 @@ def register():
         return register_action()
     else:
         # username = request.args.get('username', '') if request.args.get('username', '') else ''
-        username = request.args.get('username', '')
+        user = request.args.get('username', '')
         email = request.args.get('email', '')
-        return render_template('register.html', username=username, email=email)
+        return render_template('register.html', user=user, email=email)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
